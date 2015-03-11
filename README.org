@@ -1,0 +1,22 @@
+* reddit-to-m3u
+A Python 3 script that creates an Extended M3U playlist based on links in (a) subreddit(s).
+** Requirements
+- Python 3
+- [[https://rg3.github.io/youtube-dl/][youtube-dl]]
+** Usage
+#+BEGIN_EXAMPLE
+$ reddit-to-m3u -o out.m3u futuresynth+electronicjazz month
+#+END_EXAMPLE
+For more options consult the help:
+#+BEGIN_EXAMPLE
+$ reddit-to-m3u -h
+#+END_EXAMPLE
+** Description
+Essentially this program tries to recreate the functionality offered
+by websites such as [[http://redditplayer.phoenixforgotten.com/][Reddit Playlister]]. It improves upon the concept by
+not requiring Flash and by allowing the user to listen to the music
+with any music player that supports the Extended M3U
+format. Compatibility with music players is further improved by not
+relying on them to be able to play certain urls (eg. VLC can play
+youtube urls). Instead youtube-dl is used to grab the media urls which
+are then put in the M3U file.
