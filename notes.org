@@ -1,0 +1,18 @@
+* mpd
+** store the playlist in ~/.mpd/playlists/
+** playing back things from *youtube* => video
+*** mpd doesn't seem to like to play this streaming, inefficient anyway
+*** play back -f 140 (128k) or -f 141 (256k) instead
+** check for issues with different sites
+*** DONE youtube
+*** DONE soundcloud
+*** DONE vimeo
+**** doesn't have separate audio streams. *not going to support*, not common anyway
+*** DONE bandcamp
+** DONE extended m3u
+* mpc
+** useful commands
+*** mpc load <playlist name>
+*** mpc clear
+*** mpc playlist
+*** mpc lsplaylists
