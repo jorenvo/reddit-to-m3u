@@ -104,7 +104,6 @@ def createListOfTracks(subreddit, sort, limit):
 
     for link in response:
         link = link["data"]
-        print(link["title"])
 
         domainChecker = DomainChecker(link["domain"])
         if domainChecker.isApproved():
@@ -133,7 +132,7 @@ def getUrlWithYoutubeDl(url, domain):
 def getRawUrlThread(trackQueue):
     while True:
         link = trackQueue.get()
-        print("doing " + link["title"] + ": " + link["url"])
+        print(link["title"] + ": " + link["url"])
         link["rawUrl"] = getUrlWithYoutubeDl(link["url"], link["domain"])
         trackQueue.task_done()
 
