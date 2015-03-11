@@ -114,27 +114,35 @@ def createListOfTracks(subreddit, sort, limit):
 
     return(trackList)
 
+def getUrlWithYoutubeDl(url, domain):
+    domainChecker = DomainChecker(domain)
+    rawUrl = ""
+
+    if domainChecker.isYoutube():
+        # first try 256k
+        try:
+            rawUrl = subprocess.check_output(["youtube-dl", "-f", "141", "-g", url]).decode("utf-8").rstrip("\n")
+            # next try 128k
+        except subprocess.CalledProcessError:
+            try:
+                rawUrl = subprocess.check_output(["youtube-dl", "-f", "140", "-g", url]).decode("utf-8").rstrip("\n")
+            except subprocess.CalledProcessError:
+                print("failed " + url)
+                rawUrl = ""
+    else:
+        try:
+            rawUrl = subprocess.check_output(["youtube-dl", "-g", url]).decode("utf-8").rstrip("\n")
+        except subprocess.CalledProcessError:
+            print("failed " + url)
+            rawUrl = ""
+
+    return(rawUrl)
+
 def getRawUrlThread(trackQueue):
     while True:
         link = trackQueue.get()
-        rawUrl = ""
-        domainChecker = DomainChecker(link["domain"])
-
         print("doing " + link["title"] + ": " + link["url"])
-
-        if domainChecker.isYoutube():
-            # first try 256k
-            try:
-                link["rawUrl"] = subprocess.check_output(["youtube-dl", "-f", "141", "-g", link["url"]]).decode("utf-8").rstrip("\n")
-                # next try 128k
-            except subprocess.CalledProcessError:
-                link["rawUrl"] = subprocess.check_output(["youtube-dl", "-f", "140", "-g", link["url"]]).decode("utf-8").rstrip("\n")
-        else:
-            try:
-                link["rawUrl"] = subprocess.check_output(["youtube-dl", "-g", link["url"]]).decode("utf-8").rstrip("\n")
-            except subprocess.CalledProcessError:
-                print("failed at " + link["title"] + ":" + link["url"])
-
+        link["rawUrl"] = getUrlWithYoutubeDl(link["url"], link["domain"])
         trackQueue.task_done()
 
 def getRawUrls(trackList):
@@ -160,13 +168,11 @@ def writeTrackList(filename, trackList):
     print("#EXTM3U", file = f)
 
     for track in trackList:
-        try:
-            rawUrl = track["rawUrl"]
-        except KeyError:
-            continue
+        rawUrl = track["rawUrl"]
 
-        print("#EXTINF:-1," + track["title"], file = f)
-        print(rawUrl, file = f)
+        if rawUrl:
+            print("#EXTINF:-1," + track["title"], file = f)
+            print(rawUrl, file = f)
 
     f.close()
 
