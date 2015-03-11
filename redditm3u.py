@@ -117,24 +117,16 @@ def createListOfTracks(subreddit, sort, limit):
 def getUrlWithYoutubeDl(url, domain):
     domainChecker = DomainChecker(domain)
     rawUrl = ""
+    command = ["youtube-dl", "--no-playlist", "-g"]
 
-    if domainChecker.isYoutube():
-        # first try 256k
-        try:
-            rawUrl = subprocess.check_output(["youtube-dl", "-f", "141", "-g", url]).decode("utf-8").rstrip("\n")
-            # next try 128k
-        except subprocess.CalledProcessError:
-            try:
-                rawUrl = subprocess.check_output(["youtube-dl", "-f", "140", "-g", url]).decode("utf-8").rstrip("\n")
-            except subprocess.CalledProcessError:
-                print("failed " + url)
-                rawUrl = ""
-    else:
-        try:
-            rawUrl = subprocess.check_output(["youtube-dl", "-g", url]).decode("utf-8").rstrip("\n")
-        except subprocess.CalledProcessError:
-            print("failed " + url)
-            rawUrl = ""
+    try:
+        if domainChecker.isYoutube():
+            rawUrl = subprocess.check_output(command + ["-f", "bestaudio", url]).decode("utf-8").rstrip("\n")
+        else:
+            rawUrl = subprocess.check_output(command + [url]).decode("utf-8").rstrip("\n")
+    except subprocess.CalledProcessError:
+        print("failed " + url)
+        rawUrl = ""
 
     return(rawUrl)
 
