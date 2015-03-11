@@ -55,7 +55,12 @@ class DomainChecker:
 def parseArguments():
     parser = argparse.ArgumentParser(description = "Creates an Extended M3U playlist based on (a) subreddit(s).")
     parser.add_argument("-o", "--output-file", help = "path where the m3u playlist should be saved (default: %(default)s)", default = "~/.mpd/playlists/reddit.m3u")
-    parser.add_argument("-l", "--limit", help = "maximum amount of tracks that need to be requested from reddit.com (reddit api max: 100) (default: %(default)s)", default = 20)
+    parser.add_argument("-l", "--limit",
+                        help = "maximum amount of tracks that need to be requested from reddit.com (reddit api max: 100) (default: %(default)s)",
+                        type = int, default = 20)
+    parser.add_argument("-n", "--amount-of-threads",
+                        help = "amount of youtube-dl threads that will be spawned (default: %(default)s)",
+                        type = int, default = 16)
     parser.add_argument("subreddit", help = "one or more subreddits (eg: futuresynth+electronicjazz)")
     parser.add_argument("sort", choices = ["hot", "hour", "day", "week", "month", "year", "all"], help = "sorting method")
 
@@ -136,13 +141,12 @@ def getRawUrlThread(trackQueue):
         link["rawUrl"] = getUrlWithYoutubeDl(link["url"], link["domain"], link["title"])
         trackQueue.task_done()
 
-def getRawUrls(trackList):
+def getRawUrls(trackList, amountOfWorkerThreads):
     lock = threading.Lock()
     trackQueue = queue.Queue()
-    num_worker_threads = 4
 
     # init and start the worker threads
-    for i in range(num_worker_threads):
+    for i in range(amountOfWorkerThreads):
         t = threading.Thread(target = getRawUrlThread, args = (trackQueue,))
         t.daemon = True
         t.start()
@@ -170,6 +174,6 @@ def writeTrackList(filename, trackList):
 arguments = parseArguments()
 trackList = createListOfTracks(arguments.subreddit, arguments.sort, arguments.limit)
 
-getRawUrls(trackList)
+getRawUrls(trackList, arguments.amount_of_threads)
 
 writeTrackList(os.path.expanduser(arguments.output_file), trackList)
