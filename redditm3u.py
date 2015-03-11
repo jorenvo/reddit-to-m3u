@@ -113,7 +113,7 @@ def createListOfTracks(subreddit, sort, limit):
 
     return(trackList)
 
-def getUrlWithYoutubeDl(url, domain):
+def getUrlWithYoutubeDl(url, domain, title):
     domainChecker = DomainChecker(domain)
     rawUrl = ""
     command = ["youtube-dl", "--no-playlist", "-g"]
@@ -124,7 +124,7 @@ def getUrlWithYoutubeDl(url, domain):
         else:
             rawUrl = subprocess.check_output(command + [url]).decode("utf-8").rstrip("\n")
     except subprocess.CalledProcessError:
-        print("failed " + url)
+        print("ERROR: " + title + " (" + url + ")")
         rawUrl = ""
 
     return(rawUrl)
@@ -133,7 +133,7 @@ def getRawUrlThread(trackQueue):
     while True:
         link = trackQueue.get()
         print(link["title"] + ": " + link["url"])
-        link["rawUrl"] = getUrlWithYoutubeDl(link["url"], link["domain"])
+        link["rawUrl"] = getUrlWithYoutubeDl(link["url"], link["domain"], link["title"])
         trackQueue.task_done()
 
 def getRawUrls(trackList):
