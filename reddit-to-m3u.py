@@ -31,7 +31,7 @@ userAgent = "jorenvo.redditm3u.py"
 class DomainChecker:
     """Used to check for approved domains"""
     approvedDomainsYoutube = ["youtube.com", "youtu.be"]
-    approvedDomainsOther = ["soundcloud.com", "bandcamp.com"]
+    approvedDomainsOther = ["soundcloud.com", "bandcamp.com/track/"]
 
     def __init__(self, domainToCheck):
         self.domainToCheck = domainToCheck
@@ -110,7 +110,7 @@ def createListOfTracks(subreddit, sort, limit):
     for link in response:
         link = link["data"]
 
-        domainChecker = DomainChecker(link["domain"])
+        domainChecker = DomainChecker(link["url"])
         if domainChecker.isApproved():
             trackList.append({"domain": link["domain"],
                               "title": link["title"],
