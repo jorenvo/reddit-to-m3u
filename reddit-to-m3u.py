@@ -31,7 +31,7 @@ userAgent = "jorenvo.reddit-to-m3u.py"
 class DomainChecker:
     """Used to check for approved domains"""
     approvedDomainsYoutube = ["youtube.com", "youtu.be"]
-    approvedDomainsOther = ["soundcloud.com", "bandcamp.com/track/"]
+    approvedDomainsOther = ["soundcloud.com", "bandcamp.com"]
 
     def __init__(self, domainToCheck):
         self.domainToCheck = domainToCheck
@@ -138,7 +138,14 @@ def getRawUrlThread(trackQueue):
     while True:
         link = trackQueue.get()
         print(link["title"] + ": " + link["url"])
-        link["rawUrl"] = getUrlWithYoutubeDl(link["url"], link["domain"], link["title"])
+
+        rawUrl = getUrlWithYoutubeDl(link["url"], link["domain"], link["title"])
+
+        if not "\n" in rawUrl:
+            link["rawUrl"] = rawUrl
+        else:
+            link["rawUrl"] = ""
+
         trackQueue.task_done()
 
 def getRawUrls(trackList, amountOfWorkerThreads):
