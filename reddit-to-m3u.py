@@ -26,7 +26,7 @@ import os.path
 import threading
 import queue
 
-userAgent = "jorenvo.redditm3u.py"
+userAgent = "jorenvo.reddit-to-m3u.py"
 
 class DomainChecker:
     """Used to check for approved domains"""
